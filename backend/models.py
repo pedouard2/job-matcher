@@ -4,9 +4,11 @@ from datetime import datetime
 from typing import Annotated
 from sqlmodel import Field, Session, SQLModel, create_engine, select
 from fastapi import Depends, FastAPI, HTTPException, Query
+from sqlalchemy import JSON, Column
 
 
 class Job(SQLModel, table=True):
+
     id: Annotated[
         str,
         Field(
@@ -29,7 +31,9 @@ class Job(SQLModel, table=True):
     url: Annotated[str, Field(description="Link to the original job posting")]
     text: Annotated[str, Field(description="Full text description of the job posting")]
     date_posted: Annotated[datetime, Field(description="When the job was posted")]
-    keywords: Annotated[list[str], Field(description="When the job was posted")]
+    keywords: Annotated[
+        list[str], Field(sa_column=Column(JSON), description="When the job was posted")
+    ]
     source: Annotated[
         str, Field(description="Platform or website where the job was posted")
     ]
