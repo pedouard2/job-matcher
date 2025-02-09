@@ -1,14 +1,13 @@
 from fastapi import FastAPI, Depends
-import sqlite3
 from typing import Annotated
-from sqlmodel import Field, Session, SQLModel, create_engine, select
+from sqlmodel import Session, SQLModel, create_engine
 from contextlib import asynccontextmanager
-
-sqlite_file_name = "database.db"
-sqlite_url = f"sqlite:///{sqlite_file_name}"
+from config.settings import settings
+import models
+import requests
 
 connect_args = {"check_same_thread": False}
-engine = create_engine(sqlite_url, connect_args=connect_args)
+engine = create_engine(settings.get("database_url"), connect_args=connect_args)
 
 
 def create_db_and_tables():
@@ -30,3 +29,18 @@ async def lifespan(app: FastAPI):
 
 
 app = FastAPI(lifespan=lifespan)
+
+
+@app.get("/health")
+def health_check():
+    return {"status": "healthy"}
+
+
+@app.get("/jobs")
+def get_jobs():
+    headers = {"Authorization": f"Token {settings.api_key}"}
+    r = requests.get("https://findwork.dev/api/jobs/", headers=headers)
+
+    response = r.json()
+
+    return response
