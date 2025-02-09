@@ -1,0 +1,9 @@
+default:
+  app_name: "My FastAPI App"
+  database_url: "sqlite:///./database.db"
+
+development:
+  debug: true
+
+production:
+  debug: false
